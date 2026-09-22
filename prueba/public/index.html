@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Control de formación</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <main class="shell">
+    <section class="intro">
+      <p class="eyebrow">Click2Learn · revisión individual</p>
+      <h1>Control de formación obligatoria</h1>
+      <p class="lede">Comprueba los 11 cursos requeridos para una persona, sin guardar credenciales ni enviar correos.</p>
+      <div class="notice"><strong>Sesión segura</strong><span>El navegador se abre aparte para que introduzcas SSO y MFA manualmente.</span></div>
+    </section>
+
+    <section class="panel" aria-labelledby="check-heading">
+      <div class="panel-heading">
+        <div><p class="eyebrow">01 · Identificación</p><h2 id="check-heading">Consultar expediente</h2></div>
+        <span class="count">11 cursos</span>
+      </div>
+      <div class="actions">
+        <label for="userId">ID interno del expediente (TargetUser)</label>
+        <div class="input-row"><input id="userId" inputmode="numeric" placeholder="Ej. [USER_ID]"><button id="checkButton" class="primary">Comprobar expediente</button></div>
+        <button id="sessionButton" class="secondary">Abrir sesión de Click2Learn</button>
+        <p id="message" class="message" role="status"></p>
+      </div>
+    </section>
+
+    <section id="summary" class="summary" hidden></section>
+    <section id="results" class="results" hidden aria-live="polite"></section>
+  </main>
+  <script src="/app.js"></script>
+</body>
+</html>
