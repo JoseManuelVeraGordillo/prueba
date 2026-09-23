@@ -58,7 +58,7 @@ La lista actual incluye:
 
 ## Privacidad y permisos
 
-La herramienta no guarda credenciales, tokens ni correos. La sesión de navegador se almacena localmente en `.playwright-profile/`, que está excluida de Git.
+La herramienta no escribe credenciales, tokens ni datos de usuarios en el código. La sesión de navegador se almacena localmente en `.playwright-profile/` y puede contener cookies y datos personales del navegador; esa carpeta está excluida de Git y debe eliminarse al terminar una sesión compartida.
 
 El proyecto respeta los permisos de Click2Learn. Si la plataforma muestra **Área restringida**, la aplicación informa de que la cuenta no tiene autorización para consultar ese expediente; no intenta evitar la restricción.
 
