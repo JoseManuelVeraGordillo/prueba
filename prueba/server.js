@@ -84,31 +84,36 @@ async function checkUser(userId) {
     throw new Error(`Click2Learn ha denegado el acceso al expediente ${userId}. La cuenta autenticada no tiene permisos para consultar ese usuario.`);
   }
 
-  const results = [];
-  const searchBox = page.getByRole('textbox', { name: 'Buscar por palabra clave' });
-  if (!await searchBox.count()) {
-    throw new Error(`No se encontró el expediente para ${userId}. La sesión llegó a "${await page.title()}" (${page.url()}); la página inicial era ${homeUrl}. Comprueba permisos de consulta para ese usuario.`);
-  }
-
-  for (const course of REQUIRED_COURSES) {
-    await searchBox.fill(course);
-    await searchBox.press('Enter');
-    const escapedCourse = course.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const exactLink = page.getByRole('link', { name: new RegExp(`^${escapedCourse}(?:\\s+\\([^)]*\\))? Details$`, 'i') });
-    try {
-      await exactLink.first().waitFor({ state: 'visible', timeout: 7000 });
-    } catch {
-      // The search can return no exact match; the result is recorded below.
+  try {
+    const results = [];
+    const searchBox = page.getByRole('textbox', { name: 'Buscar por palabra clave' });
+    if (!await searchBox.count()) {
+      throw new Error(`No se encontró el expediente para ${userId}. La sesión llegó a "${await page.title()}" (${page.url()}); la página inicial era ${homeUrl}. Comprueba permisos de consulta para ese usuario.`);
     }
 
-    const record = exactLink.first().locator('xpath=ancestor::li[1]');
-    const text = await record.count() ? (await record.innerText()).replace(/\s+/g, ' ').trim() : '';
-    const completed = /Estado de la formación\s*:\s*Terminado/i.test(text);
-    const equivalent = /Equivalente completado/i.test(text);
-    results.push({ course, status: text ? (completed ? (equivalent ? 'Equivalente completado' : 'Terminado') : 'Pendiente o no terminado') : 'No encontrado', detail: text });
-  }
+    for (const course of REQUIRED_COURSES) {
+      await searchBox.fill(course);
+      await searchBox.press('Enter');
+      const escapedCourse = course.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const exactLink = page.getByRole('link', { name: new RegExp(`^${escapedCourse}(?:\\s+\\([^)]*\\))? Details$`, 'i') });
+      try {
+        await exactLink.first().waitFor({ state: 'visible', timeout: 7000 });
+      } catch {
+        // The search can return no exact match; the result is recorded below.
+      }
 
-  return { userId, checkedAt: new Date().toISOString(), results };
+      const record = exactLink.first().locator('xpath=ancestor::li[1]');
+      const text = await record.count() ? (await record.innerText()).replace(/\s+/g, ' ').trim() : '';
+      const completed = /Estado de la formación\s*:\s*Terminado/i.test(text);
+      const equivalent = /Equivalente completado/i.test(text);
+      results.push({ course, status: text ? (completed ? (equivalent ? 'Equivalente completado' : 'Terminado') : 'Pendiente o no terminado') : 'No encontrado', detail: text });
+    }
+
+    return { userId, checkedAt: new Date().toISOString(), results };
+  } finally {
+    await browserContext?.close();
+    browserContext = undefined;
+  }
 }
 
 function sendJson(response, status, payload) {
