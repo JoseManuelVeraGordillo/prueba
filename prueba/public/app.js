@@ -10,7 +10,16 @@ let lastReport;
 
 function setBusy(button, busy, label) { button.disabled = busy; if (busy) button.dataset.label = button.textContent; button.textContent = busy ? label : button.dataset.label; }
 
+function clearPreviousReport() {
+  lastReport = undefined;
+  summary.hidden = true;
+  results.hidden = true;
+  emailPanel.hidden = true;
+  document.querySelector('#recipient').value = '';
+}
+
 sessionButton.addEventListener('click', async () => {
+  clearPreviousReport();
   setBusy(sessionButton, true, 'Abriendo navegador...');
   try { const response = await fetch('/api/session', { method:'POST' }); const data = await response.json(); message.textContent = data.message || data.error; }
   catch (error) { message.textContent = error.message; }
@@ -20,7 +29,8 @@ sessionButton.addEventListener('click', async () => {
 checkButton.addEventListener('click', async () => {
   const userId = document.querySelector('#userId').value.trim();
   if (!userId) { message.textContent = 'Introduce el identificador del usuario.'; return; }
-  setBusy(checkButton, true, 'Consultando...'); summary.hidden = true; results.hidden = true;
+  clearPreviousReport();
+  setBusy(checkButton, true, 'Consultando...');
   try {
     const response = await fetch('/api/check', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ userId }) });
     const data = await response.json(); if (!response.ok) throw new Error(data.error);
