@@ -1,7 +1,7 @@
 module.exports = [
   'Básicos de Seguridad',
   'AI for all',
-  'DESAFÍO SOPRASTERIA IA',
+  'ESAFÍO SOPRASTERIA IA',
   'APPLICATION SECURITY INTRODUCTION',
   'Datos de carácter personal: ¿cómo se protegen en Sopra Steria?',
   'Igualdad de género en el trabajo: una responsabilidad compartida',
