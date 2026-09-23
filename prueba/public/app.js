@@ -44,7 +44,7 @@ checkButton.addEventListener('click', async () => {
   finally { setBusy(checkButton, false); }
 });
 
-draftButton.addEventListener('click', () => {
+draftButton.addEventListener('click', async () => {
   const recipient = document.querySelector('#recipient').value.trim();
   const emailMessage = document.querySelector('#emailMessage');
   if (!lastReport) { emailMessage.textContent = 'Primero consulta un expediente.'; return; }
@@ -60,7 +60,9 @@ draftButton.addEventListener('click', () => {
     ...lastReport.results.map(item => `- ${item.course}: ${item.status}`),
     '', 'Este mensaje se ha preparado como borrador para revisión antes del envío.',
   ].join('\n');
-  const outlookUrl = `https://outlook.office.com/mail/deeplink/compose?to=${encodeURIComponent(recipient)}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  const configResponse = await fetch('/api/config');
+  const config = await configResponse.json();
+  const outlookUrl = `${config.outlookComposeUrl}?to=${encodeURIComponent(recipient)}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   window.open(outlookUrl, '_blank', 'noopener');
   emailMessage.textContent = `Borrador preparado para ${recipient}. Revisa el contenido antes de enviarlo.`;
 });

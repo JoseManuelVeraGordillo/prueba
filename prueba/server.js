@@ -1,7 +1,10 @@
+require('dotenv').config();
+
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const { chromium } = require('playwright');
+const REQUIRED_COURSES = require('./config/courses');
 
 const PORT = Number(process.env.PORT || 3000);
 const ROOT = __dirname;
@@ -11,21 +14,14 @@ const EDGE_PATHS = [
   'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe',
   'C:\\Program Files\\Microsoft\\Edge\\Application\\msedge.exe',
 ].filter(Boolean);
-const TRANSCRIPT_URL = 'https://soprasteria.csod.com/phnx/driver.aspx?routename=Social/UniversalProfile/Transcript&TargetUser=';
+const LOGIN_URL = process.env.CLICK2LEARN_LOGIN_URL;
+const HOME_URL = process.env.CLICK2LEARN_HOME_URL;
+const TRANSCRIPT_URL = process.env.CLICK2LEARN_TRANSCRIPT_URL;
+const OUTLOOK_COMPOSE_URL = process.env.OUTLOOK_COMPOSE_URL;
 
-const REQUIRED_COURSES = [
-  'Básicos de Seguridad',
-  'AI for all',
-  'ESAFÍO SOPRASTERIA IA',
-  'APPLICATION SECURITY INTRODUCTION',
-  'Datos de carácter personal: ¿cómo se protegen en Sopra Steria?',
-  'Igualdad de género en el trabajo: una responsabilidad compartida',
-  'La sostenibilidad digital',
-  'Plan de Emergencia y Evacuación',
-  'Prevención Riesgos Laborales (PVD)',
-  'Recorrido Prevención de la corrupción',
-  'SEGURIDAD DE LA INFORMACION: ¡SIEMPRE CON PRECAUCION!',
-];
+if (!LOGIN_URL || !HOME_URL || !TRANSCRIPT_URL || !OUTLOOK_COMPOSE_URL) {
+  throw new Error('Faltan variables de entorno. Copia .env.example a .env y configura las URLs.');
+}
 
 let browserContext;
 
@@ -54,7 +50,7 @@ async function getContext() {
 async function openLogin() {
   const context = await getContext();
   const page = context.pages()[0] || await context.newPage();
-  await page.goto('https://soprasteria.csod.com/samldefault.aspx?ouid=2&returnurl=%252fDeepLink%252fProcessRedirect.aspx%253fmodule%253d22', { waitUntil: 'domcontentloaded' });
+  await page.goto(LOGIN_URL, { waitUntil: 'domcontentloaded' });
   return { message: 'Navegador abierto. Completa el inicio de sesión si lo solicita.' };
 }
 
@@ -69,7 +65,7 @@ async function checkUser(userId) {
 
   const context = await getContext();
   const page = context.pages()[0] || await context.newPage();
-  await page.goto('https://soprasteria.csod.com/ui/lms-learner-home/home', { waitUntil: 'domcontentloaded' });
+  await page.goto(HOME_URL, { waitUntil: 'domcontentloaded' });
   const homeUrl = page.url();
 
   const loginVisible = await page.getByRole('heading', { name: /sign in|welcome|iniciar sesión/i }).count();
@@ -134,6 +130,7 @@ const server = http.createServer(async (request, response) => {
     if (request.method === 'GET' && request.url === '/') return serveFile(response, 'index.html', 'text/html; charset=utf-8');
     if (request.method === 'GET' && request.url === '/styles.css') return serveFile(response, 'styles.css', 'text/css; charset=utf-8');
     if (request.method === 'GET' && request.url === '/app.js') return serveFile(response, 'app.js', 'text/javascript; charset=utf-8');
+    if (request.method === 'GET' && request.url === '/api/config') return sendJson(response, 200, { outlookComposeUrl: OUTLOOK_COMPOSE_URL });
     if (request.method === 'POST' && request.url === '/api/session') return sendJson(response, 200, await openLogin());
     if (request.method === 'POST' && request.url === '/api/check') {
       let body = '';

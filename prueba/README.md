@@ -31,6 +31,8 @@ npm install
 npm start
 ```
 
+Configura las URLs locales en `.env`; usa `.env.example` como plantilla. Ese archivo no se versiona.
+
 Abre [http://localhost:3000](http://localhost:3000).
 
 1. Pulsa **Abrir sesión de Click2Learn**.
