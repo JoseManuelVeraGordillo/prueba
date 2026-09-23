@@ -30,6 +30,14 @@
 
     <section id="summary" class="summary" hidden></section>
     <section id="results" class="results" hidden aria-live="polite"></section>
+    <section id="emailPanel" class="panel email-panel" hidden aria-labelledby="email-heading">
+      <div class="panel-heading"><div><p class="eyebrow">03 · Comunicación</p><h2 id="email-heading">Preparar correo</h2></div><span class="count">Borrador</span></div>
+      <div class="actions">
+        <label for="recipient">Correo del destinatario</label>
+        <div class="input-row"><input id="recipient" type="email" autocomplete="off" placeholder="persona@empresa.com"><button id="draftButton" class="primary">Crear borrador en Outlook</button></div>
+        <p id="emailMessage" class="message" role="status">El correo se abrirá como borrador. No se enviará automáticamente.</p>
+      </div>
+    </section>
   </main>
   <script src="/app.js"></script>
 </body>
